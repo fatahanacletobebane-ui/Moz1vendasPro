@@ -324,7 +324,7 @@
 <div id="toast" class="toast"></div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwXIdIh7ZovzCNN_ZAvUpIq5C29DShGNhrMOu3hAqn7ArtCXqDNYR8nyGZCwfE79zGP/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzAqh9qOYMMuz27owJ5bu1qilK5lclwlJsm5phT5ys-w1YXossoJJQd1FRKs3sPkq8/exec";
 const SITE_URL = "https://fatahanacletobebane-ui.github.io/Moz1vendasPro/";
 
 let products = [];
@@ -402,7 +402,10 @@ function renderProducts(){
   const list=products.filter(p=>!q||String(p.nome).toLowerCase().includes(q));
   document.getElementById("productCount").textContent=list.length+" produto(s)";
   const grid=document.getElementById("productGrid");
-  if(!list.length){grid.innerHTML='<div class="card empty" style="grid-column:1/-1">Nenhum produto aprovado encontrado.</div>';return}
+  if(!list.length){
+  grid.innerHTML='<div class="card empty" style="grid-column:1/-1"><b>Nenhum produto aprovado encontrado.</b><br><span class="small">Os produtos precisam estar com estado APROVADO no GAS para aparecer na vitrine.</span></div>';
+  return;
+}
   grid.innerHTML=list.map(p=>`
     <article class="card product-card">
       <img class="product-image" src="${esc(p.imagemUrl)}" alt="${esc(p.nome)}" loading="lazy" onerror="this.style.opacity='.25'">
@@ -649,7 +652,7 @@ async function boot(){
   if(currentUser && authToken){
     try{
       const check=await gasPost("carregarDashboard",{authToken});
-      if(!check.success) throw new Error(check.message||"Sessão expirada.");
+      if(check && check.success === false) throw new Error(check.message||"Sessão expirada.");
     }catch(_){
       currentUser=null;authToken="";
       sessionStorage.removeItem("moz1_user");
