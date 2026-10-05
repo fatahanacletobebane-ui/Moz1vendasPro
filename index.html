@@ -248,6 +248,12 @@
       margin-bottom: 14px;
     }
 
+    .partner-box { border:1px solid var(--border); border-radius:8px; padding:15px; background:#fff; }
+    .partner-code { font-weight:800; font-size:1.05rem; word-break:break-all; margin:6px 0 10px; }
+    .share-actions, .product-share { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .share-actions .btn, .product-share .btn { flex:1 1 140px; }
+    .share-link-box { display:none; margin-top:10px; padding:10px; background:#f8fafc; border:1px dashed var(--border); border-radius:6px; word-break:break-all; font-size:.85rem; color:var(--muted); }
+
     .dashboard-actions {
       display: flex;
       gap: 8px;
@@ -516,6 +522,20 @@
     <div id="dashboard-stats" class="stats-grid"></div>
 
     <div class="dashboard-panel">
+      <h3>Programa de Parceiros</h3>
+      <div class="partner-box">
+        <div class="helper">Seu código de parceiro</div>
+        <div id="partner-code" class="partner-code">A carregar...</div>
+        <div id="partner-summary" class="helper">A carregar dados das partilhas...</div>
+        <div class="share-actions">
+          <button class="btn btn-secondary" onclick="App.copiarCodigoParceiro()">Copiar código</button>
+          <button class="btn btn-success" onclick="App.partilharCatalogo()">Partilhar vitrine</button>
+        </div>
+        <div id="partner-link-box" class="share-link-box"></div>
+      </div>
+    </div>
+
+    <div class="dashboard-panel">
       <h3>Gestão da sua vitrine</h3>
 
       <div class="dashboard-actions">
@@ -699,6 +719,15 @@
 </div>
 
 <script>
+const FRONTEND_URL = 'https://fatahanacletobebane-ui.github.io/Moz1vendasPro/';
+function buildFrontendProductUrl(productId, partnerCode) {
+  const base = FRONTEND_URL;
+  let url = base + '?p=' + encodeURIComponent(productId || '');
+  if (partnerCode) url += '&ref=' + encodeURIComponent(partnerCode);
+  return url;
+}
+
+
 /* =========================================================
    URL DO WEB APP DO GOOGLE APPS SCRIPT
    ========================================================= */
@@ -904,11 +933,11 @@ const UI = {
 
         <div class="price">${preco} MT</div>
 
-        <button
-          class="btn"
-          onclick="App.comprar('${id}')">
-          Adquirir Produto
-        </button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;">
+          <button class="btn btn-success" style="flex:1;min-width:120px;" onclick="App.comprar('${id}')">Comprar</button>
+          <button class="btn btn-secondary" style="flex:1;min-width:120px;" onclick="App.verDetalhes('${id}')">Ver detalhes</button>
+          <button class="btn" style="flex:1;min-width:120px;" onclick="App.gerarLinkPartilha('${id}')">🔗 Partilhar</button>
+        </div>
       `;
 
       grid.appendChild(card);
@@ -1000,6 +1029,11 @@ const UI = {
           <span class="status ${statusClass}">
             ${Security.escapeHTML(status)}
           </span>
+          ${status === "APROVADO" ? `
+            <div class="product-share">
+              <button class="btn btn-secondary" onclick="App.gerarLinkPartilha('${Security.escapeHTML(prod.id)}')">🔗 Link de parceiro</button>
+            </div>
+          ` : ""}
         </div>
       `;
 
@@ -1017,6 +1051,7 @@ const App = {
   async init() {
 
     UI.atualizarEstadoAuth();
+    this.refParceiro = new URLSearchParams(window.location.search).get("ref") || "";
 
     await this.carregarCatalogo();
 
@@ -1029,18 +1064,14 @@ const App = {
 
 
   async carregarCatalogo() {
-
     try {
-
-      const result =
-        await API.call("listarProdutosPublicos");
-
+      const response = await fetch(GAS_WEB_APP_URL + "?action=produtos", {cache:"no-store"});
+      if (!response.ok) throw new Error("Erro HTTP " + response.status);
+      const result = await response.json();
       UI.renderCatalogo(result.produtos || []);
-
     } catch (error) {
-
       console.error("Erro ao carregar produtos:", error);
-
+      UI.renderCatalogo([]);
     }
   },
 
@@ -1167,6 +1198,7 @@ const App = {
 
     await this.carregarDashboard();
     await this.carregarMeusProdutos();
+    await this.carregarDadosParceiro();
 
     window.scrollTo({
       top: 0,
@@ -1245,6 +1277,55 @@ const App = {
     }
   },
 
+
+  async carregarDadosParceiro() {
+    try {
+      const result = await API.call("obterDadosParceiro", { userId: Session.getUserId() });
+      document.getElementById("partner-code").textContent = result.partnerCode || "—";
+      const total = Number(result.totalPartilhas || 0);
+      document.getElementById("partner-summary").textContent = total + " partilha(s) · " + (result.elegivelDesconto ? "5% de desconto desbloqueado." : "Faltam " + Math.max(0, 100-total) + " para desbloquear 5% de desconto.");
+    } catch (error) { console.error("Dados do parceiro:", error); }
+  },
+
+  getCurrentPageUrl() { return window.location.origin + window.location.pathname; },
+
+  async gerarLinkPartilha(produtoId) {
+    if (!Session.getUserId()) { UI.alerta("Entre numa conta ativa para gerar o seu link de parceiro.", "danger"); UI.abrirModalAuth(); return; }
+    try {
+      const result = await API.call("gerarLinkParceiro", { userId: Session.getUserId(), productId: produtoId });
+      const full = new URL(String(result.link || ""), this.getCurrentPageUrl()).href;
+      this.ultimoLinkPartilha = full;
+      const box = document.getElementById("partner-link-box");
+      if (box) { box.textContent = full; box.style.display = "block"; }
+      await this.compartilharLink(full, "Confira este produto na MOZ1VENDAS PRO");
+      await this.carregarDadosParceiro();
+    } catch (error) { console.error("Link parceiro:", error); }
+  },
+
+  async compartilharLink(link, texto) {
+    try {
+      if (navigator.share) { await navigator.share({ title:"MOZ1VENDAS PRO", text:texto, url:link }); return; }
+    } catch (e) { if (e && e.name === "AbortError") return; }
+    try { await navigator.clipboard.writeText(link); UI.alerta("Link copiado. Pode colá-lo no WhatsApp, Facebook ou onde quiser.", "success"); }
+    catch (e) { window.prompt("Copie o seu link de parceiro:", link); }
+  },
+
+  async copiarCodigoParceiro() {
+    const code = document.getElementById("partner-code").textContent.trim();
+    if (!code || code === "A carregar..." || code === "—") return;
+    try { await navigator.clipboard.writeText(code); UI.alerta("Código de parceiro copiado.", "success"); }
+    catch (e) { window.prompt("Código de parceiro:", code); }
+  },
+
+  async partilharCatalogo() {
+    if (!Session.getUserId()) { UI.alerta("Entre numa conta ativa para partilhar como parceiro.", "danger"); UI.abrirModalAuth(); return; }
+    const code = document.getElementById("partner-code").textContent.trim();
+    if (!code || code === "A carregar..." || code === "—") return;
+    const link = this.getCurrentPageUrl() + "?ref=" + encodeURIComponent(code);
+    const box = document.getElementById("partner-link-box");
+    if (box) { box.textContent = link; box.style.display = "block"; }
+    await this.compartilharLink(link, "Veja a vitrine da MOZ1VENDAS PRO através do meu link de parceiro.");
+  },
 
   async publicarProduto(event) {
 
@@ -1329,6 +1410,29 @@ const App = {
   },
 
 
+  async verDetalhes(produtoId) {
+    try {
+      const ref = this.refParceiro || new URLSearchParams(window.location.search).get("ref") || "";
+      const response = await fetch(GAS_WEB_APP_URL + "?action=produto&p=" + encodeURIComponent(produtoId) + (ref ? "&ref=" + encodeURIComponent(ref) : ""), {cache:"no-store"});
+      const result = await response.json();
+      if (!result || !result.id) throw new Error(result && result.message ? result.message : "Produto não encontrado.");
+      let modal=document.getElementById("produto-detalhe-modal");
+      if(!modal){
+        modal=document.createElement("div"); modal.id="produto-detalhe-modal"; modal.className="modal-backdrop";
+        modal.innerHTML='<div class="modal"><h2 id="det-nome"></h2><img id="det-img" style="width:100%;height:200px;object-fit:cover;border-radius:8px;margin-bottom:14px"><p id="det-desc" style="color:var(--muted);white-space:pre-wrap;margin-bottom:14px"></p><div id="det-preco" class="price"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="UI.fecharModal(\'produto-detalhe-modal\')">Fechar</button><button class="btn btn-success" id="det-comprar">Comprar</button></div></div>';
+        document.body.appendChild(modal); modal.addEventListener("click",e=>{if(e.target===modal) UI.fecharModal("produto-detalhe-modal")});
+      }
+      document.getElementById("det-nome").textContent=result.nome||"Produto";
+      document.getElementById("det-img").src=result.imagemUrl||"https://via.placeholder.com/600x300?text=Produto";
+      document.getElementById("det-img").onerror=function(){this.src="https://via.placeholder.com/600x300?text=Produto"};
+      document.getElementById("det-desc").textContent=result.descricao||"Sem descrição.";
+      document.getElementById("det-preco").textContent=Number(result.precoTotal||result.precoBase||0).toFixed(2)+" MT";
+      document.getElementById("det-comprar").onclick=()=>{UI.fecharModal("produto-detalhe-modal");App.comprar(produtoId)};
+      modal.style.display="flex";
+    } catch(e){ console.error(e); UI.alerta(e.message||"Não foi possível abrir os detalhes.","danger"); }
+  },
+
+
   async comprar(produtoId) {
 
     if (!Session.getUserId()) {
@@ -1350,8 +1454,10 @@ const App = {
      *
      * Não inventamos dados de pagamento aqui.
      */
+    const ref = this.refParceiro || new URLSearchParams(window.location.search).get("ref") || "";
+    sessionStorage.setItem("MOZ1VENDAS_PARTNER_REF", ref);
     UI.alerta(
-      "O produto foi selecionado. O módulo de pagamento NetShop será ligado ao checkout.",
+      ref ? "Produto selecionado através de um link de parceiro. A referência do parceiro foi preservada." : "O produto foi selecionado. O módulo de pagamento NetShop será ligado ao checkout.",
       "success"
     );
   },
