@@ -312,7 +312,7 @@
   // =========================================================
   // CONFIGURAÇÃO — GAS FORNECIDO PELO UTILIZADOR
   // =========================================================
-  const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzLNAazM35o2OE5X8B68NeRg0NaUeJgcHv6Z32wleKmLf-lMC9Oa1EvJ42qBHoJQ9-f/exec';
+  const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwqiZ4p-BltK9q3pIPX8EFrs7wUBzInCNhva8POqFjbLXDDO-SqZT9Nl_5KUCZmOuhJ/exec';
 
   let products = [];
   let currentProduct = null;
