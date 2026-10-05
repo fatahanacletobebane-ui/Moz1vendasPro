@@ -2,1497 +2,646 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MOZ1VENDAS PRO | Marketplace Digital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b7a4b">
+  <title>Moz1vendas Pro</title>
   <style>
-    :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --text: #0f172a;
-      --border: #e2e8f0;
-      --danger: #dc2626;
-      --success: #16a34a;
-      --warning: #d97706;
-      --muted: #64748b;
+    :root{
+      --primary:#0b7a4b;
+      --primary-dark:#075c39;
+      --accent:#18a76a;
+      --bg:#f4f7f6;
+      --card:#fff;
+      --text:#17221d;
+      --muted:#6d7772;
+      --border:#dfe7e3;
+      --danger:#c62828;
+      --warning:#b77900;
+      --success:#137a45;
+      --shadow:0 8px 25px rgba(18,45,34,.08);
+      --radius:18px;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;background:var(--bg);color:var(--text);
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      padding: 20px;
-      display: flex;
-      justify-content: center;
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    .app{min-height:100vh}
+    header{
+      position:sticky;top:0;z-index:20;
+      background:rgba(255,255,255,.96);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);
     }
-
-    .container {
-      width: 100%;
-      max-width: 900px;
-      background: var(--surface);
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    .nav{
+      max-width:1180px;margin:auto;padding:12px 16px;
+      display:flex;align-items:center;gap:12px;
     }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 16px;
-      margin-bottom: 24px;
-      gap: 12px;
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px;color:var(--primary)}
+    .logo{
+      width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+      background:var(--primary);color:#fff;font-weight:900;
     }
-
-    .brand {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--primary);
+    .nav-spacer{flex:1}
+    .nav button{border:0;background:transparent;color:var(--text);font-weight:700}
+    .nav .primary-btn{background:var(--primary);color:#fff;padding:10px 14px;border-radius:12px}
+    main{max-width:1180px;margin:auto;padding:22px 16px 90px}
+    .hero{
+      background:linear-gradient(135deg,#083d29,#0b7a4b);
+      color:#fff;border-radius:24px;padding:28px;margin-bottom:20px;
+      box-shadow:var(--shadow);
     }
-
-    .brand span {
-      color: var(--text);
+    .hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px)}
+    .hero p{margin:0;max-width:700px;opacity:.92;line-height:1.55}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+    .search{flex:1;min-width:220px}
+    input,select,textarea{
+      width:100%;border:1px solid var(--border);background:#fff;
+      border-radius:12px;padding:12px 13px;outline:none;color:var(--text);
     }
-
-    .header-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
+    textarea{min-height:110px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(24,167,106,.1)}
+    .btn{
+      border:0;border-radius:12px;padding:12px 16px;font-weight:800;
+      background:var(--primary);color:#fff;transition:.15s;
     }
-
-    .btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: background 0.2s;
+    .btn:hover{background:var(--primary-dark)}
+    .btn.secondary{background:#eaf3ee;color:var(--primary)}
+    .btn.danger{background:#fdecec;color:var(--danger)}
+    .btn.ghost{background:transparent;color:var(--primary);border:1px solid var(--border)}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .section{margin-top:26px}
+    .section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+    .section-title h2{margin:0;font-size:21px}
+    .muted{color:var(--muted)}
+    .grid{
+      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;
     }
-
-    .btn:hover {
-      background: var(--primary-hover);
+    .card{
+      background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+      box-shadow:var(--shadow);
     }
-
-    .btn-secondary {
-      background: #64748b;
+    .product-card{overflow:hidden;display:flex;flex-direction:column}
+    .product-image{width:100%;aspect-ratio:16/10;object-fit:cover;background:#e9efec}
+    .product-body{padding:15px;display:flex;flex-direction:column;gap:9px;flex:1}
+    .product-name{font-weight:850;font-size:17px}
+    .price{font-size:20px;font-weight:900;color:var(--primary)}
+    .small{font-size:13px}
+    .row{display:flex;gap:10px;align-items:center}
+    .row > *{flex:1}
+    .form{display:grid;gap:12px}
+    .label{font-size:13px;font-weight:800;margin-bottom:5px;display:block}
+    .hidden{display:none!important}
+    .modal{
+      position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;
+      display:none;align-items:flex-end;justify-content:center;padding:12px;
     }
-
-    .btn-secondary:hover {
-      background: #475569;
+    .modal.open{display:flex}
+    .modal-box{
+      width:min(700px,100%);max-height:92vh;overflow:auto;background:#fff;
+      border-radius:22px;padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.25);
     }
-
-    .btn-success {
-      background: var(--success);
+    .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}
+    .modal-head h3{margin:0;font-size:22px}
+    .close{border:0;background:#eef2f0;border-radius:10px;width:38px;height:38px;font-size:20px}
+    .product-detail{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .detail-img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:16px;background:#edf2ef}
+    .detail-info h2{margin:0 0 10px;font-size:27px}
+    .breakdown{background:#f2f8f4;border-radius:14px;padding:13px;margin:15px 0}
+    .breakdown div{display:flex;justify-content:space-between;gap:10px;padding:4px 0}
+    .breakdown .total{font-size:20px;font-weight:900;border-top:1px solid #d6e5dc;margin-top:8px;padding-top:10px}
+    .payment-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .method{
+      border:1px solid var(--border);padding:11px;border-radius:12px;text-align:center;
+      font-weight:800;background:#fff;
     }
-
-    .btn-success:hover {
-      background: #15803d;
+    .method.active{border-color:var(--primary);background:#eef8f3;color:var(--primary)}
+    .status{
+      display:inline-flex;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:900;
+      background:#edf2ef;color:#53605a;
     }
-
-    .btn-danger {
-      background: var(--danger);
+    .status.ok{background:#e7f7ed;color:var(--success)}
+    .status.warn{background:#fff4d8;color:var(--warning)}
+    .status.bad{background:#fdeaea;color:var(--danger)}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .stat{padding:16px}
+    .stat .v{font-size:25px;font-weight:900;color:var(--primary);margin-top:4px}
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse;min-width:620px}
+    th,td{text-align:left;padding:12px;border-bottom:1px solid var(--border);font-size:14px}
+    th{color:var(--muted);font-size:12px;text-transform:uppercase}
+    .empty{text-align:center;padding:35px 15px;color:var(--muted)}
+    .toast{
+      position:fixed;right:15px;bottom:18px;z-index:100;
+      background:#17221d;color:#fff;padding:13px 16px;border-radius:13px;
+      box-shadow:0 12px 30px rgba(0,0,0,.2);max-width:min(420px,calc(100% - 30px));
+      display:none;
     }
-
-    .btn-danger:hover {
-      background: #b91c1c;
+    .toast.show{display:block}
+    .toast.error{background:#9f2525}
+    .toast.success{background:#146b42}
+    .loader{display:none;text-align:center;padding:25px;color:var(--muted)}
+    .loader.show{display:block}
+    .login-box{max-width:520px;margin:35px auto}
+    .tabs{display:flex;gap:6px;background:#eef3f0;padding:5px;border-radius:13px;margin-bottom:15px}
+    .tab{flex:1;border:0;background:transparent;padding:10px;border-radius:9px;font-weight:800}
+    .tab.active{background:#fff;color:var(--primary);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+    .note{font-size:13px;line-height:1.5;color:var(--muted);background:#f7faf8;padding:11px;border-radius:11px}
+    footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
+    @media(max-width:900px){.grid{grid-template-columns:repeat(3,1fr)}.stats{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:680px){
+      main{padding:15px 12px 80px}.grid{grid-template-columns:repeat(2,1fr);gap:10px}
+      .product-body{padding:12px}.product-name{font-size:15px}.price{font-size:18px}
+      .product-detail{grid-template-columns:1fr}.modal{align-items:flex-end}
+      .modal-box{border-radius:22px 22px 0 0;max-height:94vh}
+      .payment-methods{grid-template-columns:1fr 1fr 1fr}.stats{grid-template-columns:1fr 1fr}
+      .hero{padding:22px 18px;border-radius:19px}.nav{padding:10px 12px}
+      .brand span{display:none}
     }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-    }
-
-    .card {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background: #fff;
-    }
-
-    .card img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      border-radius: 4px;
-      margin-bottom: 12px;
-    }
-
-    .card h3 {
-      font-size: 1.1rem;
-      margin-bottom: 8px;
-    }
-
-    .card p {
-      color: #64748b;
-      font-size: 0.9rem;
-      margin-bottom: 12px;
-      flex-grow: 1;
-    }
-
-    .card .price {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 12px;
-    }
-
-    .alert {
-      padding: 12px;
-      border-radius: 6px;
-      margin-bottom: 16px;
-      display: none;
-    }
-
-    .alert-danger {
-      background: #fee2e2;
-      color: var(--danger);
-      border: 1px solid #fca5a5;
-    }
-
-    .alert-success {
-      background: #dcfce7;
-      color: var(--success);
-      border: 1px solid #86efac;
-    }
-
-    .loading-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,0.8);
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-      z-index: 9999;
-    }
-
-    /* Dashboard - acrescentado sem alterar o visual principal */
-    #dashboard-view {
-      display: none;
-    }
-
-    .dashboard-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .dashboard-head h2 {
-      margin-bottom: 4px;
-    }
-
-    .dashboard-head p {
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 12px;
-      margin-bottom: 22px;
-    }
-
-    .stat-card {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 15px;
-      background: #fff;
-    }
-
-    .stat-card small {
-      color: var(--muted);
-    }
-
-    .stat-card strong {
-      display: block;
-      margin-top: 5px;
-      font-size: 1.35rem;
-    }
-
-    .dashboard-panel {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      background: #fff;
-      margin-bottom: 20px;
-    }
-
-    .dashboard-panel h3 {
-      margin-bottom: 14px;
-    }
-
-    .partner-box { border:1px solid var(--border); border-radius:8px; padding:15px; background:#fff; }
-    .partner-code { font-weight:800; font-size:1.05rem; word-break:break-all; margin:6px 0 10px; }
-    .share-actions, .product-share { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    .share-actions .btn, .product-share .btn { flex:1 1 140px; }
-    .share-link-box { display:none; margin-top:10px; padding:10px; background:#f8fafc; border:1px dashed var(--border); border-radius:6px; word-break:break-all; font-size:.85rem; color:var(--muted); }
-
-    .dashboard-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .my-products {
-      display: grid;
-      gap: 10px;
-    }
-
-    .my-product {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 10px;
-    }
-
-    .my-product img {
-      width: 65px;
-      height: 55px;
-      object-fit: cover;
-      border-radius: 5px;
-      background: #e2e8f0;
-    }
-
-    .my-product-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .my-product-info strong {
-      display: block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .my-product-info small {
-      color: var(--muted);
-    }
-
-    .status {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      margin-top: 5px;
-    }
-
-    .status-pendente {
-      color: #92400e;
-      background: #fef3c7;
-    }
-
-    .status-aprovado {
-      color: #166534;
-      background: #dcfce7;
-    }
-
-    .status-rejeitado {
-      color: #991b1b;
-      background: #fee2e2;
-    }
-
-    .empty-state {
-      color: var(--muted);
-      border: 1px dashed var(--border);
-      border-radius: 7px;
-      padding: 18px;
-      text-align: center;
-    }
-
-    /* Modais */
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      padding: 16px;
-    }
-
-    .modal {
-      background: #fff;
-      padding: 24px;
-      border-radius: 8px;
-      width: 100%;
-      max-width: 430px;
-      max-height: 92vh;
-      overflow-y: auto;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-    }
-
-    .modal h2 {
-      margin-bottom: 16px;
-    }
-
-    .form-group {
-      margin-bottom: 14px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 9px 12px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      font-size: 1rem;
-      outline: none;
-    }
-
-    .form-group textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(37,99,235,.1);
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 20px;
-    }
-
-    .helper {
-      color: var(--muted);
-      font-size: 0.82rem;
-      margin-top: 6px;
-    }
-
-    @media (max-width: 650px) {
-      body {
-        padding: 8px;
-      }
-
-      .container {
-        padding: 14px;
-        width: 100%;
-        overflow: visible;
-      }
-
-      header {
-        align-items: flex-start;
-        flex-wrap: wrap;
-      }
-
-      .brand {
-        font-size: 20px;
-        flex: 1 1 100%;
-      }
-
-      .header-actions {
-        width: 100%;
-        max-width: none;
-        justify-content: flex-start;
-      }
-
-      .header-actions .btn {
-        flex: 1 1 auto;
-      }
-
-      .btn {
-        padding: 10px 12px;
-      }
-
-      /* No telemóvel, o botão de adicionar produto fica sempre visível
-         e ocupa toda a largura para não desaparecer por falta de espaço. */
-      .dashboard-head {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        width: 100%;
-      }
-
-      .dashboard-head > div {
-        width: 100%;
-      }
-
-      .dashboard-head > .btn-success {
-        display: block !important;
-        width: 100%;
-        min-height: 46px;
-        font-size: 1rem;
-      }
-
-      .dashboard-actions {
-        flex-direction: column;
-        width: 100%;
-      }
-
-      .dashboard-actions .btn {
-        width: 100%;
-        min-height: 44px;
-      }
-    }
+    @media(max-width:430px){.grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr}.payment-methods{grid-template-columns:1fr}}
   </style>
 </head>
-
 <body>
-<div class="container">
+<div class="app">
+<header>
+  <nav class="nav">
+    <div class="brand"><div class="logo">M</div><span>Moz1vendas Pro</span></div>
+    <div class="nav-spacer"></div>
+    <button onclick="goHome()">Loja</button>
+    <button id="navDashboard" class="primary-btn hidden" onclick="openDashboard()">Minha conta</button>
+    <button id="navLogin" class="primary-btn" onclick="openAuth()">Entrar</button>
+    <button id="navLogout" class="hidden" onclick="logout()">Sair</button>
+  </nav>
+</header>
 
-  <header>
-    <div class="brand">MOZ1VENDAS <span>PRO</span></div>
-
-    <div class="header-actions">
-      <button id="btn-dashboard" class="btn btn-secondary" style="display:none;" onclick="App.mostrarDashboard()">
-        Dashboard
-      </button>
-
-      <button id="btn-login-view" class="btn" onclick="UI.abrirModalAuth()">
-        Entrar / Registar
-      </button>
-
-      <button id="btn-logout" class="btn btn-danger" style="display:none;" onclick="App.logout()">
-        Sair
-      </button>
+<main>
+  <section id="storeView">
+    <div class="hero">
+      <h1>Venda e compre produtos digitais.</h1>
+      <p>Bem-vindo ao Moz1vendas Pro. Encontre produtos aprovados, compre com NetShop e acompanhe a sua conta.</p>
     </div>
-  </header>
 
-  <div id="global-alert" class="alert"></div>
-
-  <!-- ================= VITRINE ================= -->
-  <main id="catalogo-view">
-    <h2 style="margin-bottom:16px;">Catálogo de Produtos</h2>
-
-    <div id="catalogo-grid" class="grid">
-      <!-- Produtos injetados dinamicamente via backend -->
+    <div class="toolbar">
+      <input id="search" class="search" type="search" placeholder="Pesquisar produtos..." oninput="renderProducts()">
+      <button class="btn secondary" onclick="loadProducts()">Atualizar</button>
     </div>
-  </main>
 
-  <!-- ================= DASHBOARD ================= -->
-  <main id="dashboard-view">
-
-    <div class="dashboard-head">
-      <div>
-        <h2>Dashboard</h2>
-        <p id="dashboard-user-info"></p>
+    <div class="section">
+      <div class="section-title">
+        <h2>Produtos disponíveis</h2>
+        <span id="productCount" class="muted small"></span>
       </div>
+      <div id="loaderProducts" class="loader show">A carregar produtos...</div>
+      <div id="productGrid" class="grid"></div>
+    </div>
+  </section>
 
-      <button class="btn btn-success" onclick="UI.abrirModalProduto()">
-        + Adicionar produto
-      </button>
+  <section id="dashboardView" class="hidden">
+    <div class="section-title">
+      <h2>Minha conta</h2>
+      <button class="btn secondary" onclick="refreshAccount()">Atualizar</button>
     </div>
 
-    <div id="dashboard-stats" class="stats-grid"></div>
+    <div id="accountInfo" class="card" style="padding:16px;margin-bottom:14px"></div>
 
-    <div class="dashboard-panel">
-      <h3>Programa de Parceiros</h3>
-      <div class="partner-box">
-        <div class="helper">Seu código de parceiro</div>
-        <div id="partner-code" class="partner-code">A carregar...</div>
-        <div id="partner-summary" class="helper">A carregar dados das partilhas...</div>
-        <div class="share-actions">
-          <button class="btn btn-secondary" onclick="App.copiarCodigoParceiro()">Copiar código</button>
-          <button class="btn btn-success" onclick="App.partilharCatalogo()">Partilhar vitrine</button>
-        </div>
-        <div id="partner-link-box" class="share-link-box"></div>
+    <div class="stats">
+      <div class="card stat"><div class="muted small">Saldo vendedor</div><div id="dashSeller" class="v">0,00 MT</div></div>
+      <div class="card stat"><div class="muted small">Saldo parceiro</div><div id="dashPartner" class="v">0,00 MT</div></div>
+      <div class="card stat"><div class="muted small">Vendas como vendedor</div><div id="dashSalesSeller" class="v">0</div></div>
+      <div class="card stat"><div class="muted small">Partilhas</div><div id="dashShares" class="v">0</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><h2>Adicionar produto</h2></div>
+      <div class="card" style="padding:18px">
+        <form id="productForm" class="form" onsubmit="publishProduct(event)">
+          <div><label class="label">Nome do produto</label><input id="pName" required></div>
+          <div><label class="label">URL da imagem</label><input id="pImage" type="url" placeholder="https://..." required></div>
+          <div><label class="label">Preço (MT)</label><input id="pPrice" type="number" min="1" step="1" required></div>
+          <div><label class="label">Descrição</label><textarea id="pDescription" required></textarea></div>
+          <div><label class="label">URL de download</label><input id="pDownload" type="url" placeholder="https://..." required></div>
+          <button id="publishBtn" class="btn" type="submit">Enviar para aprovação</button>
+          <div class="note">O GAS grava o produto como <b>PENDENTE</b>. Ele só ficará público depois de ser aprovado.</div>
+        </form>
       </div>
     </div>
 
-    <div class="dashboard-panel">
-      <h3>Gestão da sua vitrine</h3>
+    <div class="section">
+      <div class="section-title"><h2>Meus produtos</h2><button class="btn secondary" onclick="loadMyProducts()">Atualizar</button></div>
+      <div id="myProducts" class="card" style="padding:0"></div>
+    </div>
 
-      <div class="dashboard-actions">
-        <button class="btn btn-success" onclick="UI.abrirModalProduto()">
-          + Adicionar produto
-        </button>
+    <div class="section">
+      <div class="section-title"><h2>Programa de parceiro</h2></div>
+      <div id="partnerBox" class="card" style="padding:18px">A carregar...</div>
+    </div>
 
-        <button class="btn btn-secondary" onclick="App.carregarMeusProdutos()">
-          Meus produtos
-        </button>
-
-        <button class="btn" onclick="App.mostrarCatalogo()">
-          Ver vitrine
-        </button>
+    <div class="section">
+      <div class="section-title"><h2>Levantar saldo</h2></div>
+      <div class="card" style="padding:18px">
+        <form class="form" onsubmit="requestPayout(event)">
+          <div><label class="label">Perfil</label>
+            <select id="payoutProfile">
+              <option value="VENDEDOR">Vendedor</option>
+              <option value="PARCEIRO">Parceiro</option>
+            </select>
+          </div>
+          <div><label class="label">Valor (MT)</label><input id="payoutAmount" type="number" min="2" step="1" required></div>
+          <div><label class="label">Número M-Pesa / carteira</label><input id="payoutPhone" inputmode="tel" placeholder="84xxxxxxx" required></div>
+          <div><label class="label">Método</label>
+            <select id="payoutMethod">
+              <option value="mpesa">M-Pesa</option>
+              <option value="mkesh">mKesh</option>
+            </select>
+          </div>
+          <button class="btn" type="submit">Solicitar levantamento</button>
+          <div class="note">O frontend não oferece e-Mola. O pedido é enviado ao comando <b>solicitarPayoutNetshop</b> do GAS.</div>
+        </form>
       </div>
-
-      <p class="helper">
-        Os produtos enviados ficam como <strong>PENDENTE</strong> até serem aprovados pelo administrador.
-      </p>
     </div>
+  </section>
+</main>
 
-    <div class="dashboard-panel">
-      <h3>Meus produtos</h3>
-      <div id="meus-produtos" class="my-products"></div>
-    </div>
-
-  </main>
-
+<footer>Moz1vendas Pro · Loja digital</footer>
 </div>
 
-<!-- ================= MODAL AUTENTICAÇÃO ================= -->
-<div id="modal-auth" class="modal-backdrop">
-  <div class="modal">
-    <h2>Entrar na Conta</h2>
+<!-- AUTH -->
+<div id="authModal" class="modal" onclick="closeOnBackdrop(event,'authModal')">
+  <div class="modal-box">
+    <div class="modal-head"><h3>Conta Moz1vendas Pro</h3><button class="close" onclick="closeModal('authModal')">×</button></div>
+    <div class="tabs">
+      <button id="tabLogin" class="tab active" onclick="switchAuth('login')">Entrar</button>
+      <button id="tabRegister" class="tab" onclick="switchAuth('register')">Criar conta</button>
+    </div>
 
-    <form onsubmit="App.autenticar(event)">
+    <div id="loginPanel">
+      <form class="form" onsubmit="login(event)">
+        <div><label class="label">Telefone</label><input id="loginPhone" inputmode="tel" placeholder="84xxxxxxx"></div>
+        <div><label class="label">E-mail</label><input id="loginEmail" type="email" required></div>
+        <div><label class="label">Código de ativação</label><input id="loginCode" inputmode="numeric" maxlength="6" placeholder="Somente no primeiro login"></div>
+        <div><label class="label">PIN</label><input id="loginPin" type="password" inputmode="numeric" required></div>
+        <button id="loginBtn" class="btn">Entrar</button>
+        <div class="note">No primeiro login, o GAS exige o código de ativação de 6 dígitos e o PIN. Nos logins seguintes, o código não é necessário.</div>
+      </form>
+    </div>
 
-      <div class="form-group">
-        <label>Telefone</label>
-        <input type="text" id="auth-telefone" required placeholder="+258840000000">
-      </div>
-
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="auth-email" required placeholder="seu@email.com">
-      </div>
-
-      <div class="form-group">
-        <label>Código de ativação</label>
-        <input
-          type="text"
-          id="auth-codigo"
-          maxlength="6"
-          inputmode="numeric"
-          placeholder="6 dígitos — apenas no primeiro login">
-        <div class="helper">
-          O código de ativação só é necessário no primeiro login.
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>PIN de 4 dígitos</label>
-        <input
-          type="password"
-          id="auth-pin"
-          maxlength="4"
-          pattern="[0-9]{4}"
-          inputmode="numeric"
-          required
-          placeholder="****">
-      </div>
-
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" onclick="UI.fecharModal('modal-auth')">
-          Cancelar
-        </button>
-
-        <button type="submit" class="btn">
-          Entrar
-        </button>
-      </div>
-    </form>
-
-    <div style="margin-top:15px;text-align:center;">
-      <button class="btn btn-secondary" onclick="UI.abrirModalRegisto()">
-        Ainda não tenho conta
-      </button>
+    <div id="registerPanel" class="hidden">
+      <form class="form" onsubmit="register(event)">
+        <div><label class="label">Telefone</label><input id="regPhone" inputmode="tel" placeholder="84xxxxxxx" required></div>
+        <div><label class="label">E-mail</label><input id="regEmail" type="email" required></div>
+        <button id="registerBtn" class="btn">Solicitar cadastro</button>
+        <div id="registerResult" class="note hidden"></div>
+      </form>
     </div>
   </div>
 </div>
 
-<!-- ================= MODAL REGISTO ================= -->
-<div id="modal-registo" class="modal-backdrop">
-  <div class="modal">
-    <h2>Criar Nova Conta</h2>
-
-    <form onsubmit="App.registar(event)">
-
-      <div class="form-group">
-        <label>Telefone</label>
-        <input type="text" id="reg-telefone" required placeholder="+258840000000">
-      </div>
-
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="reg-email" required placeholder="seu@email.com">
-      </div>
-
-      <div class="helper">
-        Depois do pedido, receberá o código de ativação através do administrador.
-      </div>
-
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" onclick="UI.fecharModal('modal-registo')">
-          Cancelar
-        </button>
-
-        <button type="submit" class="btn">
-          Registar
-        </button>
-      </div>
-    </form>
+<!-- PRODUCT -->
+<div id="productModal" class="modal" onclick="closeOnBackdrop(event,'productModal')">
+  <div class="modal-box">
+    <div class="modal-head"><h3>Produto</h3><button class="close" onclick="closeModal('productModal')">×</button></div>
+    <div id="productDetail"></div>
   </div>
 </div>
 
-<!-- ================= MODAL ADICIONAR PRODUTO ================= -->
-<div id="modal-produto" class="modal-backdrop">
-  <div class="modal">
-    <h2>Adicionar Produto</h2>
-
-    <p class="helper" style="margin-bottom:16px;">
-      Preencha os dados do produto. O produto será enviado para aprovação.
-    </p>
-
-    <form onsubmit="App.publicarProduto(event)">
-
-      <div class="form-group">
-        <label>Nome do produto</label>
-        <input type="text" id="produto-nome" maxlength="150" required placeholder="Nome do produto">
-      </div>
-
-      <div class="form-group">
-        <label>URL da imagem</label>
-        <input type="url" id="produto-imagem" required placeholder="https://...">
-      </div>
-
-      <div class="form-group">
-        <label>Preço (MT)</label>
-        <input type="number" id="produto-preco" min="1" step="0.01" required placeholder="100">
-      </div>
-
-      <div class="form-group">
-        <label>Descrição</label>
-        <textarea id="produto-descricao" maxlength="2000" required placeholder="Descrição do produto"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label>Link de download</label>
-        <input type="url" id="produto-download" required placeholder="https://...">
-        <div class="helper">
-          Este é o link entregue ao comprador depois do pagamento.
-        </div>
-      </div>
-
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" onclick="UI.fecharModal('modal-produto')">
-          Cancelar
-        </button>
-
-        <button type="submit" class="btn btn-success">
-          Enviar para aprovação
-        </button>
-      </div>
-
-    </form>
+<!-- DOWNLOAD -->
+<div id="downloadModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-head"><h3>Pagamento confirmado</h3></div>
+    <div style="text-align:center;padding:15px">
+      <div style="font-size:48px">✓</div>
+      <h2>Compra concluída!</h2>
+      <p class="muted">O pagamento foi confirmado pelo NetShop.</p>
+      <a id="downloadLink" class="btn" href="#" target="_blank" rel="noopener">Baixar produto</a>
+      <button class="btn secondary" style="margin-top:10px" onclick="closeModal('downloadModal')">Fechar</button>
+    </div>
   </div>
 </div>
 
-<div id="loading" class="loading-overlay">
-  A processar operação...
-</div>
+<div id="toast" class="toast"></div>
 
 <script>
-/* =========================================================
-   URL DO WEB APP DO GOOGLE APPS SCRIPT
-   ========================================================= */
-const GAS_WEB_APP_URL =
-"https://script.google.com/macros/s/AKfycbwXIdIh7ZovzCNN_ZAvUpIq5C29DShGNhrMOu3hAqn7ArtCXqDNYR8nyGZCwfE79zGP/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwXIdIh7ZovzCNN_ZAvUpIq5C29DShGNhrMOu3hAqn7ArtCXqDNYR8nyGZCwfE79zGP/exec";
+const SITE_URL = "https://fatahanacletobebane-ui.github.io/Moz1vendasPro/";
 
+let products = [];
+let currentProduct = null;
+let currentCharge = null;
+let currentUser = JSON.parse(localStorage.getItem("moz1_user") || "null");
+let partnerRef = new URLSearchParams(location.search).get("ref") || localStorage.getItem("moz1_parceiro_ref") || "";
+if (partnerRef) localStorage.setItem("moz1_parceiro_ref", partnerRef);
 
-/* =========================================================
-   SEGURANÇA
-   ========================================================= */
-const Security = {
-  escapeHTML(value) {
-    const div = document.createElement("div");
-    div.textContent = String(value ?? "");
-    return div.innerHTML;
+function money(v){ return Number(v||0).toLocaleString("pt-PT",{minimumFractionDigits:2,maximumFractionDigits:2}) + " MT"; }
+function esc(v){
+  return String(v ?? "").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+function toast(msg,type=""){const el=document.getElementById("toast");el.textContent=msg;el.className="toast show "+type;clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.className="toast",4200);}
+function openModal(id){document.getElementById(id).classList.add("open")}
+function closeModal(id){document.getElementById(id).classList.remove("open")}
+function closeOnBackdrop(e,id){if(e.target.id===id)closeModal(id)}
+function goHome(){document.getElementById("storeView").classList.remove("hidden");document.getElementById("dashboardView").classList.add("hidden");window.scrollTo({top:0,behavior:"smooth"})}
+function openAuth(){switchAuth("login");openModal("authModal")}
+function switchAuth(mode){
+  const login=mode==="login";
+  document.getElementById("loginPanel").classList.toggle("hidden",!login);
+  document.getElementById("registerPanel").classList.toggle("hidden",login);
+  document.getElementById("tabLogin").classList.toggle("active",login);
+  document.getElementById("tabRegister").classList.toggle("active",!login);
+}
+function logout(){
+  currentUser=null;localStorage.removeItem("moz1_user");
+  document.getElementById("navLogin").classList.remove("hidden");
+  document.getElementById("navDashboard").classList.add("hidden");
+  document.getElementById("navLogout").classList.add("hidden");
+  goHome();toast("Sessão encerrada.","success");
+}
+function updateNav(){
+  const logged=!!currentUser;
+  document.getElementById("navLogin").classList.toggle("hidden",logged);
+  document.getElementById("navDashboard").classList.toggle("hidden",!logged);
+  document.getElementById("navLogout").classList.toggle("hidden",!logged);
+}
+async function gasPost(action,data={}){
+  const body=JSON.stringify({action,...data});
+  try{
+    const r=await fetch(GAS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body});
+    const text=await r.text();
+    try{return JSON.parse(text)}catch(e){throw new Error("O GAS devolveu uma resposta que não é JSON.");}
+  }catch(err){
+    throw new Error("Não foi possível comunicar com o GAS. Verifique a implantação do Web App e o acesso público. "+err.message);
   }
-};
+}
+async function gasGet(params){
+  const url=GAS_URL+"?"+new URLSearchParams(params);
+  try{
+    const r=await fetch(url,{method:"GET",cache:"no-store"});
+    const text=await r.text();
+    try{return JSON.parse(text)}catch(e){throw new Error("Resposta inválida do GAS.");}
+  }catch(err){throw new Error("Não foi possível carregar os dados do GAS. "+err.message);}
+}
 
-
-/* =========================================================
-   SESSÃO
-   O GAS fornecido devolve user.id.
-   Não usamos sessionToken porque o GAS atual não o cria.
-   ========================================================= */
-const Session = {
-
-  getUser() {
-    try {
-      return JSON.parse(sessionStorage.getItem("MOZ1VENDAS_USER") || "null");
-    } catch (e) {
-      return null;
-    }
-  },
-
-  getUserId() {
-    const user = this.getUser();
-    return user ? user.id : null;
-  },
-
-  setUser(user) {
-    sessionStorage.setItem("MOZ1VENDAS_USER", JSON.stringify(user));
-  },
-
-  clear() {
-    sessionStorage.removeItem("MOZ1VENDAS_USER");
-  }
-};
-
-
-/* =========================================================
-   API
-   Compatível com o doPost() do GAS enviado.
-   ========================================================= */
-const API = {
-
-  async call(action, data = {}) {
-
-    if (!GAS_WEB_APP_URL) {
-      throw new Error("URL do Google Apps Script não configurada.");
-    }
-
-    UI.loading(true);
-
-    try {
-
-      const response = await fetch(GAS_WEB_APP_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify({
-          action: action,
-          data: data
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro HTTP " + response.status);
-      }
-
-      const result = await response.json();
-
-      if (result && result.success === false) {
-        throw new Error(result.message || "Operação não concluída.");
-      }
-
-      return result;
-
-    } catch (error) {
-
-      UI.alerta(error.message || "Erro de comunicação com o servidor.", "danger");
-      throw error;
-
-    } finally {
-
-      UI.loading(false);
-
-    }
-  }
-};
-
-
-/* =========================================================
-   INTERFACE
-   ========================================================= */
-const UI = {
-
-  loading(show) {
-    document.getElementById("loading").style.display = show ? "flex" : "none";
-  },
-
-  alerta(mensagem, tipo = "success") {
-
-    const el = document.getElementById("global-alert");
-
-    el.textContent = mensagem;
-    el.className = "alert " + (tipo === "danger" ? "alert-danger" : "alert-success");
-    el.style.display = "block";
-
-    clearTimeout(this.alertTimer);
-
-    this.alertTimer = setTimeout(() => {
-      el.style.display = "none";
-    }, 6000);
-  },
-
-  atualizarEstadoAuth() {
-
-    const logged = !!Session.getUserId();
-
-    document.getElementById("btn-login-view").style.display =
-      logged ? "none" : "inline-block";
-
-    document.getElementById("btn-logout").style.display =
-      logged ? "inline-block" : "none";
-
-    document.getElementById("btn-dashboard").style.display =
-      logged ? "inline-block" : "none";
-  },
-
-  abrirModalAuth() {
-    this.fecharModal("modal-registo");
-    document.getElementById("modal-auth").style.display = "flex";
-  },
-
-  abrirModalRegisto() {
-    this.fecharModal("modal-auth");
-    document.getElementById("modal-registo").style.display = "flex";
-  },
-
-  abrirModalProduto() {
-
-    if (!Session.getUserId()) {
-      this.alerta("Entre numa conta ativa para adicionar produtos.", "danger");
-      this.abrirModalAuth();
-      return;
-    }
-
-    document.getElementById("modal-produto").style.display = "flex";
-  },
-
-  fecharModal(id) {
-    document.getElementById(id).style.display = "none";
-  },
-
-  renderCatalogo(produtos) {
-
-    const grid = document.getElementById("catalogo-grid");
-    grid.innerHTML = "";
-
-    if (!produtos || produtos.length === 0) {
-      grid.innerHTML =
-        '<div class="empty-state">Nenhum produto digital disponível no momento.</div>';
-      return;
-    }
-
-    produtos.forEach(prod => {
-
-      const card = document.createElement("div");
-      card.className = "card";
-
-      const imgUrl = Security.escapeHTML(
-        prod.imagemUrl ||
-        "https://via.placeholder.com/300x160?text=Produto+Digital"
-      );
-
-      const nome = Security.escapeHTML(prod.nome);
-      const id = Security.escapeHTML(prod.id);
-      const preco = Number(prod.preco || 0).toFixed(2);
-      const views = Number(prod.visualizacoes || 0);
-
-      card.innerHTML = `
-        <img
-          src="${imgUrl}"
-          alt="${nome}"
-          loading="lazy"
-          onerror="this.src='https://via.placeholder.com/300x160?text=Produto+Digital'"
-        >
-
-        <h3>${nome}</h3>
-
-        <p>${views} visualizações</p>
-
-        <div class="price">${preco} MT</div>
-
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;">
-          <button class="btn btn-success" style="flex:1;min-width:120px;" onclick="App.comprar('${id}')">Comprar</button>
-          <button class="btn btn-secondary" style="flex:1;min-width:120px;" onclick="App.verDetalhes('${id}')">Ver detalhes</button>
-          <button class="btn" style="flex:1;min-width:120px;" onclick="App.gerarLinkPartilha('${id}')">🔗 Partilhar</button>
+async function loadProducts(){
+  const loader=document.getElementById("loaderProducts"),grid=document.getElementById("productGrid");
+  loader.classList.add("show");grid.innerHTML="";
+  try{
+    const res=await gasGet({action:"produtos"});
+    if(!res.success)throw new Error(res.message||"Erro ao listar produtos.");
+    products=Array.isArray(res.produtos)?res.produtos:[];
+    renderProducts();
+  }catch(e){grid.innerHTML=`<div class="card empty" style="grid-column:1/-1">${esc(e.message)}</div>`;toast(e.message,"error")}
+  finally{loader.classList.remove("show")}
+}
+function renderProducts(){
+  const q=document.getElementById("search").value.trim().toLowerCase();
+  const list=products.filter(p=>!q||String(p.nome).toLowerCase().includes(q));
+  document.getElementById("productCount").textContent=list.length+" produto(s)";
+  const grid=document.getElementById("productGrid");
+  if(!list.length){grid.innerHTML='<div class="card empty" style="grid-column:1/-1">Nenhum produto aprovado encontrado.</div>';return}
+  grid.innerHTML=list.map(p=>`
+    <article class="card product-card">
+      <img class="product-image" src="${esc(p.imagemUrl)}" alt="${esc(p.nome)}" loading="lazy" onerror="this.style.opacity='.25'">
+      <div class="product-body">
+        <div class="product-name">${esc(p.nome)}</div>
+        <div class="price">${money(p.preco)}</div>
+        <div class="muted small">${Number(p.visualizacoes||0)} visualizações</div>
+        <button class="btn" onclick="openProduct('${encodeURIComponent(p.id)}')">Ver produto</button>
+      </div>
+    </article>`).join("");
+}
+async function openProduct(id){
+  const box=document.getElementById("productDetail");
+  box.innerHTML='<div class="loader show">A carregar produto...</div>';openModal("productModal");
+  try{
+    const res=await gasPost("obterDetalhesProduto",{idProduto:decodeURIComponent(id),idUsuarioLogado:currentUser?currentUser.id:null,ref:partnerRef||""});
+    if(!res){box.innerHTML='<div class="empty">Produto indisponível.</div>';return}
+    if(res.success===false)throw new Error(res.message||"Produto indisponível.");
+    currentProduct=res;
+    box.innerHTML=productDetailHTML(res);
+  }catch(e){box.innerHTML=`<div class="empty">${esc(e.message)}</div>`;toast(e.message,"error")}
+}
+function productDetailHTML(p){
+  const min=p.precoTotal;
+  return `
+    <div class="product-detail">
+      <div><img class="detail-img" src="${esc(p.imagemUrl)}" alt="${esc(p.nome)}"></div>
+      <div class="detail-info">
+        <h2>${esc(p.nome)}</h2>
+        <p class="muted">${esc(p.descricao)}</p>
+        <div class="breakdown">
+          <div><span>Produto</span><b>${money(p.precoBase)}</b></div>
+          <div><span>Taxa da plataforma</span><b>${money(p.taxaPlataforma)}</b></div>
+          ${Number(p.desconto||0)>0?`<div><span>Desconto</span><b>-${money(p.desconto)}</b></div>`:""}
+          <div class="total"><span>Total</span><b>${money(p.precoTotal)}</b></div>
         </div>
-      `;
-
-      grid.appendChild(card);
-    });
-  },
-
-  renderDashboard(data) {
-
-    const stats = document.getElementById("dashboard-stats");
-
-    stats.innerHTML = `
-      <div class="stat-card">
-        <small>Saldo vendedor</small>
-        <strong>${Number(data.saldoVendedor || 0).toFixed(2)} MT</strong>
-      </div>
-
-      <div class="stat-card">
-        <small>Vendas como vendedor</small>
-        <strong>${Number(data.vendasVendedor || 0)}</strong>
-      </div>
-
-      <div class="stat-card">
-        <small>Partilhas</small>
-        <strong>${Number(data.totalPartilhas || 0)}</strong>
-      </div>
-
-      <div class="stat-card">
-        <small>Saldo parceiro</small>
-        <strong>${Number(data.saldoParceiro || 0).toFixed(2)} MT</strong>
-      </div>
-    `;
-  },
-
-  renderMeusProdutos(produtos) {
-
-    const box = document.getElementById("meus-produtos");
-    box.innerHTML = "";
-
-    if (!produtos || produtos.length === 0) {
-
-      box.innerHTML = `
-        <div class="empty-state">
-          Ainda não adicionou nenhum produto.
-          <br><br>
-          <button class="btn btn-success" onclick="UI.abrirModalProduto()">
-            + Adicionar produto
-          </button>
+        ${p.temDesconto?'<div class="note">Você tem desconto de parceiro aplicado pelo GAS.</div>':""}
+        <div style="height:12px"></div>
+        <h3>Pagamento</h3>
+        <div class="payment-methods" style="margin:10px 0">
+          <button id="method-mpesa" class="method active" onclick="selectMethod('mpesa')">M-Pesa</button>
+          <button id="method-mkesh" class="method" onclick="selectMethod('mkesh')">mKesh</button>
+          <button id="method-card" class="method" onclick="selectMethod('card')">Cartão</button>
         </div>
-      `;
-
-      return;
-    }
-
-    produtos.forEach(prod => {
-
-      const status = String(prod.status || "").toUpperCase();
-
-      let statusClass = "status-pendente";
-
-      if (status === "APROVADO") {
-        statusClass = "status-aprovado";
-      }
-
-      if (status === "REJEITADO") {
-        statusClass = "status-rejeitado";
-      }
-
-      const row = document.createElement("div");
-      row.className = "my-product";
-
-      row.innerHTML = `
-        <img
-          src="${Security.escapeHTML(prod.imagemUrl || "")}"
-          alt=""
-          onerror="this.src='https://via.placeholder.com/100x80?text=Produto'"
-        >
-
-        <div class="my-product-info">
-          <strong>${Security.escapeHTML(prod.nome)}</strong>
-
-          <small>
-            ${Number(prod.preco || 0).toFixed(2)} MT
-            ·
-            ${Number(prod.visualizacoes || 0)} visualizações
-          </small>
-
-          <br>
-
-          <span class="status ${statusClass}">
-            ${Security.escapeHTML(status)}
-          </span>
-          ${status === "APROVADO" ? `
-            <div class="product-share">
-              <button class="btn btn-secondary" onclick="App.gerarLinkPartilha('${Security.escapeHTML(prod.id)}')">🔗 Link de parceiro</button>
-            </div>
-          ` : ""}
-        </div>
-      `;
-
-      box.appendChild(row);
+        <div id="payPhoneGroup"><label class="label">Número da carteira</label><input id="payPhone" inputmode="tel" placeholder="84xxxxxxx"></div>
+        <div id="payEmailGroup" class="hidden"><label class="label">E-mail para o checkout</label><input id="payEmail" type="email" value="${esc(currentUser?.email||"")}"></div>
+        <button id="payBtn" class="btn" style="margin-top:12px" onclick="payProduct()">Pagar ${money(min)}</button>
+        <div class="note" style="margin-top:10px">e-Mola não é apresentado porque não está a funcionar no seu NetShop.</div>
+      </div>
+    </div>`;
+}
+let selectedMethod="mpesa";
+function selectMethod(method){
+  selectedMethod=method;
+  ["mpesa","mkesh","card"].forEach(m=>document.getElementById("method-"+m)?.classList.toggle("active",m===method));
+  document.getElementById("payPhoneGroup").classList.toggle("hidden",method==="card");
+  document.getElementById("payEmailGroup").classList.toggle("hidden",method!=="card");
+}
+async function payProduct(){
+  if(!currentProduct)return;
+  if(selectedMethod!=="card" && !document.getElementById("payPhone").value.trim()){toast("Informe o número do telemóvel.","error");return}
+  if(selectedMethod==="card" && !document.getElementById("payEmail").value.trim()){toast("Informe o e-mail.","error");return}
+  const btn=document.getElementById("payBtn");btn.disabled=true;btn.textContent="A processar...";
+  try{
+    const res=await gasPost("processarPagamentoNetshop",{
+      idProduto:currentProduct.id,
+      valorTotal:currentProduct.precoTotal,
+      metodo:selectedMethod,
+      telefone:document.getElementById("payPhone")?.value||"",
+      email:document.getElementById("payEmail")?.value||"",
+      idParceiro:partnerRef||"",
+      idComprador:currentUser?currentUser.id:null
     });
-  }
-};
-
-
-/* =========================================================
-   APP
-   ========================================================= */
-const App = {
-
-  async init() {
-
-    UI.atualizarEstadoAuth();
-    this.refParceiro = new URLSearchParams(window.location.search).get("ref") || "";
-
-    await this.carregarCatalogo();
-
-    const user = Session.getUser();
-
-    if (user && user.id) {
-      await this.carregarDashboardSilencioso();
+    if(!res.success)throw new Error(res.message||"Não foi possível criar a cobrança.");
+    if(res.isCard){
+      if(!res.redirectUrl)throw new Error("O NetShop não devolveu o checkout do cartão.");
+      window.location.href=res.redirectUrl;return;
     }
-  },
-
-
-  async carregarCatalogo() {
-    try {
-      const response = await fetch(GAS_WEB_APP_URL + "?action=produtos", {cache:"no-store"});
-      if (!response.ok) throw new Error("Erro HTTP " + response.status);
-      const result = await response.json();
-      UI.renderCatalogo(result.produtos || []);
-    } catch (error) {
-      console.error("Erro ao carregar produtos:", error);
-      UI.renderCatalogo([]);
+    if(res.isPaid){showDownload(res.downloadUrl);return}
+    if(res.chargeId){
+      currentCharge=res.chargeId;
+      toast("Cobrança criada. Autorize o pagamento no telemóvel.","success");
+      monitorCharge(res.chargeId);
+    }else toast("Pedido enviado. Estado: "+(res.status||"pendente"),"success");
+  }catch(e){toast(e.message,"error")}
+  finally{btn.disabled=false;btn.textContent="Pagar "+money(currentProduct.precoTotal)}
+}
+function monitorCharge(chargeId){
+  let tries=0;
+  const timer=setInterval(async()=>{
+    tries++;
+    try{
+      const res=await gasPost("verificarEstadoCobrancaNetshop",{chargeId});
+      const st=String(res.status||"").toLowerCase();
+      if(st==="paid"){clearInterval(timer);showDownload(res.downloadUrl)}
+      else if(["failed","cancelled","expired"].includes(st)){clearInterval(timer);toast("Pagamento não concluído: "+st,"error")}
+      else if(tries>=30){clearInterval(timer);toast("Ainda não foi possível confirmar o pagamento. Pode voltar a tentar consultar mais tarde.","error")}
+    }catch(e){
+      if(tries>=30){clearInterval(timer);toast(e.message,"error")}
     }
-  },
+  },4000);
+}
+function showDownload(url){
+  if(!url){toast("Pagamento confirmado, mas o link de download não foi devolvido pelo GAS.","error");return}
+  document.getElementById("downloadLink").href=url;
+  closeModal("productModal");openModal("downloadModal");
+  localStorage.removeItem("moz1_parceiro_ref");partnerRef="";
+}
 
-
-  async autenticar(event) {
-
-    event.preventDefault();
-
-    const telefone =
-      document.getElementById("auth-telefone").value.trim();
-
-    const email =
-      document.getElementById("auth-email").value.trim();
-
-    const codigo =
-      document.getElementById("auth-codigo").value.trim();
-
-    const pin =
-      document.getElementById("auth-pin").value.trim();
-
-    if (!/^[0-9]{4}$/.test(pin)) {
-
-      UI.alerta(
-        "O PIN deve ter exatamente 4 dígitos.",
-        "danger"
-      );
-
-      return;
-    }
-
-    try {
-
-      const result =
-        await API.call("autenticarUsuario", {
-          telefone: telefone,
-          email: email,
-          codigo: codigo,
-          pin: pin
-        });
-
-      if (!result.user) {
-        throw new Error(
-          result.message || "Utilizador não recebido pelo servidor."
-        );
-      }
-
-      Session.setUser(result.user);
-
-      UI.fecharModal("modal-auth");
-
-      UI.atualizarEstadoAuth();
-
-      UI.alerta(
-        result.message || "Login efetuado com sucesso.",
-        "success"
-      );
-
-      await this.mostrarDashboard();
-
-    } catch (error) {
-
-      console.error(error);
-
-    }
-  },
-
-
-  async registar(event) {
-
-    event.preventDefault();
-
-    const telefone =
-      document.getElementById("reg-telefone").value.trim();
-
-    const email =
-      document.getElementById("reg-email").value.trim();
-
-    try {
-
-      const result =
-        await API.call("registrarUsuario", {
-          telefone: telefone,
-          email: email
-        });
-
-      UI.fecharModal("modal-registo");
-
-      UI.alerta(
-        result.message ||
-        "Pedido criado. Contacte o administrador para receber o código.",
-        "success"
-      );
-
-      if (result.waLink) {
-        setTimeout(() => {
-          window.open(result.waLink, "_blank");
-        }, 500);
-      }
-
-    } catch (error) {
-
-      console.error(error);
-
-    }
-  },
-
-
-  async mostrarDashboard() {
-
-    const user = Session.getUser();
-
-    if (!user || !user.id) {
-      UI.abrirModalAuth();
-      return;
-    }
-
-    document.getElementById("catalogo-view").style.display = "none";
-    document.getElementById("dashboard-view").style.display = "block";
-
-    document.getElementById("dashboard-user-info").textContent =
-      (user.email || user.telefone || "") +
-      " · Conta " +
-      (user.status || "ATIVA");
-
-    await this.carregarDashboard();
-    await this.carregarMeusProdutos();
-    await this.carregarDadosParceiro();
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
+async function register(e){
+  e.preventDefault();
+  const btn=document.getElementById("registerBtn"),out=document.getElementById("registerResult");
+  btn.disabled=true;btn.textContent="A enviar...";
+  try{
+    const res=await gasPost("registrarUsuario",{telefone:document.getElementById("regPhone").value,email:document.getElementById("regEmail").value});
+    if(!res.success)throw new Error(res.message||"Não foi possível criar o pedido.");
+    out.classList.remove("hidden");
+    out.innerHTML=esc(res.message||"Pedido criado.")+(res.waLink?`<br><br><a class="btn" href="${esc(res.waLink)}" target="_blank" rel="noopener">Enviar mensagem de validação</a>`:"");
+  }catch(e){toast(e.message,"error")}
+  finally{btn.disabled=false;btn.textContent="Solicitar cadastro"}
+}
+async function login(e){
+  e.preventDefault();
+  const btn=document.getElementById("loginBtn");btn.disabled=true;btn.textContent="A entrar...";
+  try{
+    const res=await gasPost("autenticarUsuario",{
+      telefone:document.getElementById("loginPhone").value,
+      email:document.getElementById("loginEmail").value,
+      codigo:document.getElementById("loginCode").value,
+      pin:document.getElementById("loginPin").value
     });
-  },
-
-
-  mostrarCatalogo() {
-
-    document.getElementById("dashboard-view").style.display = "none";
-    document.getElementById("catalogo-view").style.display = "block";
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
-  },
-
-
-  async carregarDashboard() {
-
-    try {
-
-      const result =
-        await API.call("carregarDashboard", {
-          userId: Session.getUserId()
-        });
-
-      UI.renderDashboard(result);
-
-    } catch (error) {
-
-      console.error("Erro no dashboard:", error);
-
-    }
-  },
-
-
-  async carregarDashboardSilencioso() {
-
-    try {
-
-      const result =
-        await API.call("carregarDashboard", {
-          userId: Session.getUserId()
-        });
-
-      UI.renderDashboard(result);
-
-    } catch (error) {
-
-      console.warn("Dashboard silencioso:", error.message);
-
-    }
-  },
-
-
-  async carregarMeusProdutos() {
-
-    try {
-
-      const result =
-        await API.call("listarMeusProdutos", {
-          userId: Session.getUserId()
-        });
-
-      UI.renderMeusProdutos(
-        result.produtos || []
-      );
-
-    } catch (error) {
-
-      console.error("Meus produtos:", error);
-
-    }
-  },
-
-
-  async carregarDadosParceiro() {
-    try {
-      const result = await API.call("obterDadosParceiro", { userId: Session.getUserId() });
-      document.getElementById("partner-code").textContent = result.partnerCode || "—";
-      const total = Number(result.totalPartilhas || 0);
-      document.getElementById("partner-summary").textContent = total + " partilha(s) · " + (result.elegivelDesconto ? "5% de desconto desbloqueado." : "Faltam " + Math.max(0, 100-total) + " para desbloquear 5% de desconto.");
-    } catch (error) { console.error("Dados do parceiro:", error); }
-  },
-
-  getCurrentPageUrl() { return window.location.origin + window.location.pathname; },
-
-  async gerarLinkPartilha(produtoId) {
-    if (!Session.getUserId()) { UI.alerta("Entre numa conta ativa para gerar o seu link de parceiro.", "danger"); UI.abrirModalAuth(); return; }
-    try {
-      const result = await API.call("gerarLinkParceiro", { userId: Session.getUserId(), productId: produtoId });
-      const full = new URL(String(result.link || ""), this.getCurrentPageUrl()).href;
-      this.ultimoLinkPartilha = full;
-      const box = document.getElementById("partner-link-box");
-      if (box) { box.textContent = full; box.style.display = "block"; }
-      await this.compartilharLink(full, "Confira este produto na MOZ1VENDAS PRO");
-      await this.carregarDadosParceiro();
-    } catch (error) { console.error("Link parceiro:", error); }
-  },
-
-  async compartilharLink(link, texto) {
-    try {
-      if (navigator.share) { await navigator.share({ title:"MOZ1VENDAS PRO", text:texto, url:link }); return; }
-    } catch (e) { if (e && e.name === "AbortError") return; }
-    try { await navigator.clipboard.writeText(link); UI.alerta("Link copiado. Pode colá-lo no WhatsApp, Facebook ou onde quiser.", "success"); }
-    catch (e) { window.prompt("Copie o seu link de parceiro:", link); }
-  },
-
-  async copiarCodigoParceiro() {
-    const code = document.getElementById("partner-code").textContent.trim();
-    if (!code || code === "A carregar..." || code === "—") return;
-    try { await navigator.clipboard.writeText(code); UI.alerta("Código de parceiro copiado.", "success"); }
-    catch (e) { window.prompt("Código de parceiro:", code); }
-  },
-
-  async partilharCatalogo() {
-    if (!Session.getUserId()) { UI.alerta("Entre numa conta ativa para partilhar como parceiro.", "danger"); UI.abrirModalAuth(); return; }
-    const code = document.getElementById("partner-code").textContent.trim();
-    if (!code || code === "A carregar..." || code === "—") return;
-    const link = this.getCurrentPageUrl() + "?ref=" + encodeURIComponent(code);
-    const box = document.getElementById("partner-link-box");
-    if (box) { box.textContent = link; box.style.display = "block"; }
-    await this.compartilharLink(link, "Veja a vitrine da MOZ1VENDAS PRO através do meu link de parceiro.");
-  },
-
-  async publicarProduto(event) {
-
-    event.preventDefault();
-
-    const produto = {
-
-      nome:
-        document.getElementById("produto-nome")
-        .value.trim(),
-
-      imagemUrl:
-        document.getElementById("produto-imagem")
-        .value.trim(),
-
-      preco:
-        Number(
-          document.getElementById("produto-preco")
-          .value
-        ),
-
-      descricao:
-        document.getElementById("produto-descricao")
-        .value.trim(),
-
-      downloadUrl:
-        document.getElementById("produto-download")
-        .value.trim()
+    if(!res.success)throw new Error(res.message||"Login recusado.");
+    currentUser=res.user;localStorage.setItem("moz1_user",JSON.stringify(currentUser));
+    updateNav();closeModal("authModal");toast(res.message||"Login efetuado.","success");openDashboard();
+  }catch(e){toast(e.message,"error")}
+  finally{btn.disabled=false;btn.textContent="Entrar"}
+}
+function openDashboard(){
+  if(!currentUser){openAuth();return}
+  document.getElementById("storeView").classList.add("hidden");
+  document.getElementById("dashboardView").classList.remove("hidden");
+  refreshAccount();window.scrollTo({top:0,behavior:"smooth"});
+}
+async function refreshAccount(){
+  if(!currentUser)return;
+  document.getElementById("accountInfo").innerHTML=`<b>${esc(currentUser.email||"")}</b><br><span class="muted">${esc(currentUser.telefone||"")} · Parceiro: ${esc(currentUser.partnerCode||"")}</span>`;
+  try{
+    const res=await gasPost("carregarDashboard",{userId:currentUser.id});
+    if(!res.success)throw new Error(res.message||"Não foi possível carregar o dashboard.");
+    document.getElementById("dashSeller").textContent=money(res.saldoVendedor);
+    document.getElementById("dashPartner").textContent=money(res.saldoParceiro);
+    document.getElementById("dashSalesSeller").textContent=res.vendasVendedor||0;
+    document.getElementById("dashShares").textContent=res.totalPartilhas||0;
+    document.getElementById("partnerBox").innerHTML=`
+      <div class="row"><div><b>${esc(currentUser.partnerCode||"—")}</b><div class="muted small">Código de parceiro</div></div>
+      <span class="status ${res.descontoElegivel?"ok":"warn"}">${res.descontoElegivel?"Desconto elegível":"Ainda sem desconto"}</span></div>
+      <p class="muted small" style="margin-top:10px">Partilhas: <b>${res.totalPartilhas||0}</b>. Limite configurado pelo GAS: 100.</p>
+      <button class="btn secondary" onclick="loadPartnerProducts()">Gerar link de parceiro</button>
+      <div id="partnerProducts" style="margin-top:10px"></div>`;
+    await loadMyProducts();
+  }catch(e){toast(e.message,"error")}
+}
+async function loadMyProducts(){
+  const box=document.getElementById("myProducts");box.innerHTML='<div class="empty">A carregar...</div>';
+  try{
+    const res=await gasPost("listarMeusProdutos",{userId:currentUser.id});
+    if(!res.success)throw new Error(res.message||"Erro.");
+    const list=res.produtos||[];
+    if(!list.length){box.innerHTML='<div class="empty">Ainda não tem produtos.</div>';return}
+    box.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Produto</th><th>Preço</th><th>Estado</th><th>Visualizações</th><th></th></tr></thead><tbody>${list.map(p=>`
+      <tr><td><b>${esc(p.nome)}</b></td><td>${money(p.preco)}</td><td>${statusBadge(p.status)}</td><td>${p.visualizacoes||0}</td>
+      <td>${p.status==="APROVADO"?`<button class="btn secondary small" onclick="openProduct('${encodeURIComponent(p.id)}')">Abrir</button>`:"—"}</td></tr>`).join("")}</tbody></table></div>`;
+  }catch(e){box.innerHTML=`<div class="empty">${esc(e.message)}</div>`}
+}
+function statusBadge(s){
+  const v=String(s||"").toUpperCase();let c=v==="APROVADO"?"ok":(v==="PENDENTE"?"warn":"bad");
+  return `<span class="status ${c}">${esc(v)}</span>`;
+}
+async function publishProduct(e){
+  e.preventDefault();
+  const btn=document.getElementById("publishBtn");btn.disabled=true;btn.textContent="A enviar...";
+  try{
+    const produto={
+      nome:document.getElementById("pName").value.trim(),
+      imagemUrl:document.getElementById("pImage").value.trim(),
+      preco:Number(document.getElementById("pPrice").value),
+      descricao:document.getElementById("pDescription").value.trim(),
+      downloadUrl:document.getElementById("pDownload").value.trim()
     };
+    const res=await gasPost("publicarProduto",{userId:currentUser.id,produto});
+    if(!res.success)throw new Error(res.message||"Não foi possível publicar.");
+    document.getElementById("productForm").reset();toast(res.message||"Produto enviado para aprovação.","success");loadMyProducts();
+  }catch(e){toast(e.message,"error")}
+  finally{btn.disabled=false;btn.textContent="Enviar para aprovação"}
+}
+async function loadPartnerProducts(){
+  const box=document.getElementById("partnerProducts");if(!box)return;
+  box.innerHTML='<div class="muted small">A carregar produtos aprovados...</div>';
+  try{
+    const res=await gasGet({action:"produtos"});
+    if(!res.success)throw new Error(res.message||"Erro.");
+    const list=res.produtos||[];
+    box.innerHTML=list.map(p=>`<div class="row" style="padding:9px 0;border-bottom:1px solid var(--border)">
+      <span>${esc(p.nome)}</span><button class="btn secondary small" onclick="generatePartnerLink('${encodeURIComponent(p.id)}')">Gerar link</button>
+    </div>`).join("")||'<div class="muted small">Não há produtos aprovados.</div>';
+  }catch(e){box.innerHTML=`<div class="muted small">${esc(e.message)}</div>`}
+}
+async function generatePartnerLink(id){
+  try{
+    const res=await gasPost("gerarLinkParceiro",{userId:currentUser.id,productId:decodeURIComponent(id)});
+    if(!res.success)throw new Error(res.message||"Não foi possível gerar o link.");
+    const link=new URL(res.link||"",SITE_URL).href;
+    await navigator.clipboard?.writeText(link);
+    const box=document.getElementById("partnerProducts");
+    box.innerHTML+=`<div class="note" style="margin-top:8px"><b>Link:</b><br><a href="${esc(link)}" target="_blank">${esc(link)}</a><br><button class="btn secondary" style="margin-top:8px" onclick="copyText('${encodeURIComponent(link)}')">Copiar</button></div>`;
+    toast("Link gerado.","success");
+  }catch(e){toast(e.message,"error")}
+}
+async function copyText(encoded){try{await navigator.clipboard.writeText(decodeURIComponent(encoded));toast("Link copiado.","success")}catch(e){toast("Copie o link manualmente.","error")}}
+async function requestPayout(e){
+  e.preventDefault();
+  if(!currentUser)return;
+  try{
+    const res=await gasPost("solicitarPayoutNetshop",{
+      userId:currentUser.id,
+      perfil:document.getElementById("payoutProfile").value,
+      valor:Number(document.getElementById("payoutAmount").value),
+      telefone:document.getElementById("payoutPhone").value,
+      metodo:document.getElementById("payoutMethod").value
+    });
+    if(!res.success)throw new Error(res.message||"Pedido recusado.");
+    toast(res.message||"Pedido enviado.","success");refreshAccount();
+  }catch(e){toast(e.message,"error")}
+}
 
-
-    if (
-      !produto.nome ||
-      !produto.imagemUrl ||
-      !produto.descricao ||
-      !produto.downloadUrl ||
-      !(produto.preco > 0)
-    ) {
-
-      UI.alerta(
-        "Preencha nome, imagem, preço, descrição e link de download.",
-        "danger"
-      );
-
-      return;
-    }
-
-
-    try {
-
-      const result =
-        await API.call("publicarProduto", {
-
-          userId:
-            Session.getUserId(),
-
-          produto:
-            produto
-
-        });
-
-
-      UI.fecharModal("modal-produto");
-
-      event.target.reset();
-
-      UI.alerta(
-        result.message ||
-        "Produto enviado para aprovação.",
-        "success"
-      );
-
-
-      await this.carregarMeusProdutos();
-      await this.carregarDashboard();
-
-    } catch (error) {
-
-      console.error("Erro ao publicar:", error);
-
-    }
-  },
-
-
-  async verDetalhes(produtoId) {
-    try {
-      const ref = this.refParceiro || new URLSearchParams(window.location.search).get("ref") || "";
-      const response = await fetch(GAS_WEB_APP_URL + "?action=produto&p=" + encodeURIComponent(produtoId) + (ref ? "&ref=" + encodeURIComponent(ref) : ""), {cache:"no-store"});
-      const result = await response.json();
-      if (!result || !result.id) throw new Error(result && result.message ? result.message : "Produto não encontrado.");
-      let modal=document.getElementById("produto-detalhe-modal");
-      if(!modal){
-        modal=document.createElement("div"); modal.id="produto-detalhe-modal"; modal.className="modal-backdrop";
-        modal.innerHTML='<div class="modal"><h2 id="det-nome"></h2><img id="det-img" style="width:100%;height:200px;object-fit:cover;border-radius:8px;margin-bottom:14px"><p id="det-desc" style="color:var(--muted);white-space:pre-wrap;margin-bottom:14px"></p><div id="det-preco" class="price"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="UI.fecharModal(\'produto-detalhe-modal\')">Fechar</button><button class="btn btn-success" id="det-comprar">Comprar</button></div></div>';
-        document.body.appendChild(modal); modal.addEventListener("click",e=>{if(e.target===modal) UI.fecharModal("produto-detalhe-modal")});
-      }
-      document.getElementById("det-nome").textContent=result.nome||"Produto";
-      document.getElementById("det-img").src=result.imagemUrl||"https://via.placeholder.com/600x300?text=Produto";
-      document.getElementById("det-img").onerror=function(){this.src="https://via.placeholder.com/600x300?text=Produto"};
-      document.getElementById("det-desc").textContent=result.descricao||"Sem descrição.";
-      document.getElementById("det-preco").textContent=Number(result.precoTotal||result.precoBase||0).toFixed(2)+" MT";
-      document.getElementById("det-comprar").onclick=()=>{UI.fecharModal("produto-detalhe-modal");App.comprar(produtoId)};
-      modal.style.display="flex";
-    } catch(e){ console.error(e); UI.alerta(e.message||"Não foi possível abrir os detalhes.","danger"); }
-  },
-
-
-  async comprar(produtoId) {
-
-    if (!Session.getUserId()) {
-
-      UI.alerta(
-        "Faça login numa conta ativa para efetuar a compra.",
-        "danger"
-      );
-
-      UI.abrirModalAuth();
-
-      return;
-    }
-
-    /*
-     * O GAS fornecido possui processarPagamentoNetshop(),
-     * mas o frontend ainda não recebeu telefone/método de
-     * pagamento específico para criar a cobrança.
-     *
-     * Não inventamos dados de pagamento aqui.
-     */
-    const ref = this.refParceiro || new URLSearchParams(window.location.search).get("ref") || "";
-    sessionStorage.setItem("MOZ1VENDAS_PARTNER_REF", ref);
-    UI.alerta(
-      ref ? "Produto selecionado através de um link de parceiro. A referência do parceiro foi preservada." : "O produto foi selecionado. O módulo de pagamento NetShop será ligado ao checkout.",
-      "success"
-    );
-  },
-
-
-  async logout() {
-
-    Session.clear();
-
-    UI.atualizarEstadoAuth();
-
-    this.mostrarCatalogo();
-
-    UI.alerta(
-      "Sessão encerrada.",
-      "success"
-    );
-  }
-};
-
-
-/* =========================================================
-   FECHAR MODAL AO CLICAR FORA
-   ========================================================= */
-document.querySelectorAll(".modal-backdrop").forEach(modal => {
-
-  modal.addEventListener("click", event => {
-
-    if (event.target === modal) {
-      modal.style.display = "none";
-    }
-
-  });
-
-});
-
-
-/* =========================================================
-   INICIALIZAÇÃO
-   ========================================================= */
-document.addEventListener("DOMContentLoaded", () => {
-  App.init();
-});
+async function boot(){
+  updateNav();
+  await loadProducts();
+  const p=new URLSearchParams(location.search).get("p");
+  if(p)openProduct(encodeURIComponent(p));
+}
+boot();
 </script>
-
 </body>
 </html>
