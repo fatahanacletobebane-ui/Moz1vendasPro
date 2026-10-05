@@ -249,7 +249,7 @@
               <option value="PARCEIRO">Parceiro</option>
             </select>
           </div>
-          <div><label class="label">Valor (MT)</label><input id="payoutAmount" type="number" min="2" step="1" required></div>
+          <div><label class="label">Valor (MT)</label><input id="payoutAmount" type="number" min="0.01" step="1" required></div>
           <div><label class="label">Número M-Pesa / carteira</label><input id="payoutPhone" inputmode="tel" placeholder="84xxxxxxx" required></div>
           <div><label class="label">Método</label>
             <select id="payoutMethod">
@@ -330,7 +330,8 @@ const SITE_URL = "https://fatahanacletobebane-ui.github.io/Moz1vendasPro/";
 let products = [];
 let currentProduct = null;
 let currentCharge = null;
-let currentUser = JSON.parse(localStorage.getItem("moz1_user") || "null");
+let currentUser = JSON.parse(sessionStorage.getItem("moz1_user") || "null");
+let authToken = sessionStorage.getItem("moz1_authToken") || "";
 let partnerRef = new URLSearchParams(location.search).get("ref") || localStorage.getItem("moz1_parceiro_ref") || "";
 if (partnerRef) localStorage.setItem("moz1_parceiro_ref", partnerRef);
 
@@ -351,12 +352,14 @@ function switchAuth(mode){
   document.getElementById("tabLogin").classList.toggle("active",login);
   document.getElementById("tabRegister").classList.toggle("active",!login);
 }
-function logout(){
-  currentUser=null;localStorage.removeItem("moz1_user");
-  document.getElementById("navLogin").classList.remove("hidden");
-  document.getElementById("navDashboard").classList.add("hidden");
-  document.getElementById("navLogout").classList.add("hidden");
-  goHome();toast("Sessão encerrada.","success");
+async function logout(){
+  try{
+    if(authToken) await gasPost("terminarSessao",{authToken});
+  }catch(_){}
+  currentUser=null;authToken="";
+  sessionStorage.removeItem("moz1_user");
+  sessionStorage.removeItem("moz1_authToken");
+  updateNav();goHome();toast("Sessão encerrada.","success");
 }
 function updateNav(){
   const logged=!!currentUser;
@@ -415,7 +418,7 @@ async function openProduct(id){
   const box=document.getElementById("productDetail");
   box.innerHTML='<div class="loader show">A carregar produto...</div>';openModal("productModal");
   try{
-    const res=await gasPost("obterDetalhesProduto",{idProduto:decodeURIComponent(id),idUsuarioLogado:currentUser?currentUser.id:null,ref:partnerRef||""});
+    const res=await gasPost("obterDetalhesProduto",{idProduto:decodeURIComponent(id),authToken:authToken||"",ref:partnerRef||""});
     if(!res){box.innerHTML='<div class="empty">Produto indisponível.</div>';return}
     if(res.success===false)throw new Error(res.message||"Produto indisponível.");
     currentProduct=res;
@@ -446,7 +449,7 @@ function productDetailHTML(p){
         </div>
         <div id="payPhoneGroup"><label class="label">Número da carteira</label><input id="payPhone" inputmode="tel" placeholder="84xxxxxxx"></div>
         <div id="payEmailGroup" class="hidden"><label class="label">E-mail para o checkout</label><input id="payEmail" type="email" value="${esc(currentUser?.email||"")}"></div>
-        <button id="payBtn" class="btn" style="margin-top:12px" onclick="payProduct()">Pagar ${money(min)}</button>
+        <button id="payBtn" class="btn" style="margin-top:12px" onclick="payProduct()">Continuar para pagamento · ${money(min)}</button>
         <div class="note" style="margin-top:10px">e-Mola não é apresentado porque não está a funcionar no seu NetShop.</div>
       </div>
     </div>`;
@@ -471,7 +474,7 @@ async function payProduct(){
       telefone:document.getElementById("payPhone")?.value||"",
       email:document.getElementById("payEmail")?.value||"",
       idParceiro:partnerRef||"",
-      idComprador:currentUser?currentUser.id:null
+      authToken:authToken||""
     });
     if(!res.success)throw new Error(res.message||"Não foi possível criar a cobrança.");
     if(res.isCard){
@@ -532,13 +535,17 @@ async function login(e){
       pin:document.getElementById("loginPin").value
     });
     if(!res.success)throw new Error(res.message||"Login recusado.");
-    currentUser=res.user;localStorage.setItem("moz1_user",JSON.stringify(currentUser));
+    currentUser=res.user;
+    authToken=String(res.authToken||"");
+    if(!authToken) throw new Error("O GAS não devolveu uma sessão segura.");
+    sessionStorage.setItem("moz1_user",JSON.stringify(currentUser));
+    sessionStorage.setItem("moz1_authToken",authToken);
     updateNav();closeModal("authModal");toast(res.message||"Login efetuado.","success");openDashboard();
   }catch(e){toast(e.message,"error")}
   finally{btn.disabled=false;btn.textContent="Entrar"}
 }
 function openDashboard(){
-  if(!currentUser){openAuth();return}
+  if(!currentUser || !authToken){currentUser=null;authToken="";sessionStorage.removeItem("moz1_user");sessionStorage.removeItem("moz1_authToken");openAuth();return}
   document.getElementById("storeView").classList.add("hidden");
   document.getElementById("dashboardView").classList.remove("hidden");
   refreshAccount();window.scrollTo({top:0,behavior:"smooth"});
@@ -547,7 +554,7 @@ async function refreshAccount(){
   if(!currentUser)return;
   document.getElementById("accountInfo").innerHTML=`<b>${esc(currentUser.email||"")}</b><br><span class="muted">${esc(currentUser.telefone||"")} · Parceiro: ${esc(currentUser.partnerCode||"")}</span>`;
   try{
-    const res=await gasPost("carregarDashboard",{userId:currentUser.id});
+    const res=await gasPost("carregarDashboard",{authToken});
     if(!res.success)throw new Error(res.message||"Não foi possível carregar o dashboard.");
     document.getElementById("dashSeller").textContent=money(res.saldoVendedor);
     document.getElementById("dashPartner").textContent=money(res.saldoParceiro);
@@ -556,7 +563,7 @@ async function refreshAccount(){
     document.getElementById("partnerBox").innerHTML=`
       <div class="row"><div><b>${esc(currentUser.partnerCode||"—")}</b><div class="muted small">Código de parceiro</div></div>
       <span class="status ${res.descontoElegivel?"ok":"warn"}">${res.descontoElegivel?"Desconto elegível":"Ainda sem desconto"}</span></div>
-      <p class="muted small" style="margin-top:10px">Partilhas: <b>${res.totalPartilhas||0}</b>. Limite configurado pelo GAS: 100.</p>
+      <p class="muted small" style="margin-top:10px">Partilhas: <b>${res.totalPartilhas||0}</b>. O desconto é calculado exclusivamente pelo GAS.</p>
       <button class="btn secondary" onclick="loadPartnerProducts()">Gerar link de parceiro</button>
       <div id="partnerProducts" style="margin-top:10px"></div>`;
     await loadMyProducts();
@@ -565,7 +572,7 @@ async function refreshAccount(){
 async function loadMyProducts(){
   const box=document.getElementById("myProducts");box.innerHTML='<div class="empty">A carregar...</div>';
   try{
-    const res=await gasPost("listarMeusProdutos",{userId:currentUser.id});
+    const res=await gasPost("listarMeusProdutos",{authToken});
     if(!res.success)throw new Error(res.message||"Erro.");
     const list=res.produtos||[];
     if(!list.length){box.innerHTML='<div class="empty">Ainda não tem produtos.</div>';return}
@@ -589,7 +596,7 @@ async function publishProduct(e){
       descricao:document.getElementById("pDescription").value.trim(),
       downloadUrl:document.getElementById("pDownload").value.trim()
     };
-    const res=await gasPost("publicarProduto",{userId:currentUser.id,produto});
+    const res=await gasPost("publicarProduto",{authToken,produto});
     if(!res.success)throw new Error(res.message||"Não foi possível publicar.");
     document.getElementById("productForm").reset();toast(res.message||"Produto enviado para aprovação.","success");loadMyProducts();
   }catch(e){toast(e.message,"error")}
@@ -609,7 +616,7 @@ async function loadPartnerProducts(){
 }
 async function generatePartnerLink(id){
   try{
-    const res=await gasPost("gerarLinkParceiro",{userId:currentUser.id,productId:decodeURIComponent(id)});
+    const res=await gasPost("gerarLinkParceiro",{authToken,productId:decodeURIComponent(id)});
     if(!res.success)throw new Error(res.message||"Não foi possível gerar o link.");
     const link=new URL(res.link||"",SITE_URL).href;
     await navigator.clipboard?.writeText(link);
@@ -624,7 +631,7 @@ async function requestPayout(e){
   if(!currentUser)return;
   try{
     const res=await gasPost("solicitarPayoutNetshop",{
-      userId:currentUser.id,
+      authToken,
       perfil:document.getElementById("payoutProfile").value,
       valor:Number(document.getElementById("payoutAmount").value),
       telefone:document.getElementById("payoutPhone").value,
@@ -638,6 +645,24 @@ async function requestPayout(e){
 async function boot(){
   updateNav();
   await loadProducts();
+
+  if(currentUser && authToken){
+    try{
+      const check=await gasPost("carregarDashboard",{authToken});
+      if(!check.success) throw new Error(check.message||"Sessão expirada.");
+    }catch(_){
+      currentUser=null;authToken="";
+      sessionStorage.removeItem("moz1_user");
+      sessionStorage.removeItem("moz1_authToken");
+      updateNav();
+    }
+  }else if(currentUser || authToken){
+    currentUser=null;authToken="";
+    sessionStorage.removeItem("moz1_user");
+    sessionStorage.removeItem("moz1_authToken");
+    updateNav();
+  }
+
   const p=new URLSearchParams(location.search).get("p");
   if(p)openProduct(encodeURIComponent(p));
 }
