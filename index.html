@@ -224,7 +224,22 @@
         <div><h2>Minha conta</h2><p>Área do vendedor e parceiro.</p></div>
         <button class="btn btn-outline" onclick="logout()">Sair</button>
       </div>
-      <div id="dashboardContent" class="dashboard"></div>
+
+      <div class="hero-card" style="margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div>
+            <b style="font-size:1.08rem">Área do vendedor</b>
+            <div class="hint">Publique produtos e acompanhe os produtos enviados para aprovação.</div>
+          </div>
+          <button id="addProductTopBtn" class="btn btn-primary" type="button" onclick="openAddProduct()">
+            ＋ Adicionar produto
+          </button>
+        </div>
+      </div>
+
+      <div id="dashboardContent" class="dashboard">
+        <div class="loading">A carregar o dashboard...</div>
+      </div>
     </div>
   </section>
 </main>
@@ -753,8 +768,17 @@
   }
 
   function openAddProduct(){
-    if(!usuarioLogado) return openLogin();
-    $('prodNome').value=''; $('prodImagem').value=''; $('prodPreco').value=''; $('prodDescricao').value=''; $('prodDownload').value=''; $('publishMsg').innerHTML='';
+    if(!usuarioLogado){
+      toast('Entre na sua conta para adicionar produtos.');
+      openLogin();
+      return;
+    }
+    $('prodNome').value='';
+    $('prodImagem').value='';
+    $('prodPreco').value='';
+    $('prodDescricao').value='';
+    $('prodDownload').value='';
+    $('publishMsg').innerHTML='';
     openModal('addProductModal');
   }
 
