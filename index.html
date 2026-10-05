@@ -274,6 +274,25 @@
   </div>
 </div>
 
+<!-- ADD PRODUCT -->
+<div id="addProductModal" class="modal" onclick="closeOnBackdrop(event,'addProductModal')">
+  <div class="modal-box">
+    <div class="modal-head"><h3>Adicionar produto</h3><button class="close" onclick="closeModal('addProductModal')">×</button></div>
+    <form class="form" onsubmit="publishProduct(event)">
+      <div class="notice info">O produto será enviado como <b>PENDENTE</b>. Depois da aprovação do administrador, aparecerá automaticamente na vitrine.</div>
+      <div class="form-group"><label>Nome do produto</label><input id="prodNome" required maxlength="160" placeholder="Ex.: Curso de Excel Completo"></div>
+      <div class="form-group"><label>URL da imagem</label><input id="prodImagem" type="url" required placeholder="https://.../imagem.jpg"></div>
+      <div class="row">
+        <div class="form-group"><label>Preço (MT)</label><input id="prodPreco" type="number" min="0.01" step="0.01" required placeholder="100"></div>
+        <div class="form-group"><label>Link de download</label><input id="prodDownload" type="url" required placeholder="https://drive.google.com/..." ></div>
+      </div>
+      <div class="form-group"><label>Descrição</label><textarea id="prodDescricao" rows="5" required maxlength="5000" placeholder="Descreva o produto..."></textarea></div>
+      <div id="publishMsg"></div>
+      <button id="publishBtn" class="btn btn-primary">Enviar para aprovação</button>
+    </form>
+  </div>
+</div>
+
 <!-- CHECKOUT -->
 <div id="checkoutModal" class="modal" onclick="closeOnBackdrop(event,'checkoutModal')">
   <div class="modal-box">
@@ -312,7 +331,7 @@
   // =========================================================
   // CONFIGURAÇÃO — GAS FORNECIDO PELO UTILIZADOR
   // =========================================================
-  const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwqiZ4p-BltK9q3pIPX8EFrs7wUBzInCNhva8POqFjbLXDDO-SqZT9Nl_5KUCZmOuhJ/exec';
+  const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwXIdIh7ZovzCNN_ZAvUpIq5C29DShGNhrMOu3hAqn7ArtCXqDNYR8nyGZCwfE79zGP/exec';
 
   let products = [];
   let currentProduct = null;
@@ -661,13 +680,21 @@
       const res = await apiPost('carregarDashboard',{userId:usuarioLogado.id});
       if(!res.success) throw new Error(res.message || 'Não foi possível carregar a conta.');
 
+      const prodRes = await apiPost('listarMeusProdutos',{userId:usuarioLogado.id});
+      const meusProdutos = prodRes.success && Array.isArray(prodRes.produtos) ? prodRes.produtos : [];
+      const partnerCode = usuarioLogado.partnerCode || '';
+
       $('dashboardContent').innerHTML = `
         <div class="balance-grid">
           <div class="balance"><span>Saldo vendedor</span><strong>${money(res.saldoVendedor)}</strong><button class="btn btn-primary" style="margin-top:10px" onclick="cashout('VENDEDOR')">Levantar</button></div>
           <div class="balance"><span>Saldo parceiro</span><strong>${money(res.saldoParceiro)}</strong><button class="btn btn-primary" style="margin-top:10px" onclick="cashout('PARCEIRO')">Levantar</button></div>
         </div>
+
         <div class="hero-card">
-          <b>Resumo da conta</b>
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+            <b>Área do vendedor</b>
+            <button class="btn btn-primary" onclick="openAddProduct()">＋ Adicionar produto</button>
+          </div>
           <div class="hero-stats">
             <div class="stat"><b>${Number(res.vendasVendedor || 0)}</b><span>vendas como vendedor</span></div>
             <div class="stat"><b>${Number(res.vendasParceiro || 0)}</b><span>vendas como parceiro</span></div>
@@ -677,10 +704,92 @@
             ${res.descontoElegivel ? 'Você já é elegível para o desconto de parceiro.' : 'Ao atingir 100 partilhas, fica elegível para 5% de desconto.'}
           </div>
         </div>
+
+        <div class="hero-card">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+            <div><b>Meus produtos</b><div class="hint">Acompanhe aprovação, preço e visualizações.</div></div>
+            <button class="btn btn-light" onclick="loadDashboard()">Atualizar</button>
+          </div>
+          <div style="display:grid;gap:10px">
+            ${meusProdutos.length ? meusProdutos.map(renderMyProduct).join('') : '<div class="empty">Você ainda não publicou nenhum produto.</div>'}
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+            <div><b>Área de parceiro</b><div class="hint">Use o seu código para partilhar produtos aprovados.</div></div>
+            <span class="user-pill">${escapeHtml(partnerCode || '—')}</span>
+          </div>
+          <div class="notice info" style="margin-top:12px">
+            Cada produto aprovado pode ter um link de parceiro próprio. Ao partilhar, o comprador pode entrar pela sua referência.
+          </div>
+        </div>
       `;
     }catch(err){
       $('dashboardContent').innerHTML = '<div class="notice error">' + escapeHtml(err.message) + '</div>';
     }
+  }
+
+  function renderMyProduct(p){
+    const status = String(p.status || 'PENDENTE').toUpperCase();
+    const statusClass = status === 'APROVADO' ? 'success' : (status === 'REJEITADO' ? 'error' : 'info');
+    const shareBtn = status === 'APROVADO' ? `<button class="btn btn-light" onclick="generatePartnerLink('${escapeHtml(p.id)}')">🔗 Link parceiro</button>` : '';
+    return `
+      <div style="border:1px solid var(--line);border-radius:14px;padding:13px;background:#fff">
+        <div style="display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+          <div style="display:flex;gap:11px;align-items:center;min-width:0">
+            <div style="width:58px;height:58px;border-radius:10px;background:#eef3f1;overflow:hidden;flex:none">
+              ${p.imagemUrl ? `<img src="${escapeHtml(p.imagemUrl)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : ''}
+            </div>
+            <div style="min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(p.nome)}</b><span class="hint">${money(p.preco)} • 👁 ${Number(p.visualizacoes || 0)}</span></div>
+          </div>
+          <span class="notice ${statusClass}" style="padding:6px 9px;font-size:.75rem;font-weight:800">${escapeHtml(status)}</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          ${shareBtn}
+          ${status === 'APROVADO' && p.urlProduto ? `<button class="btn btn-outline" onclick="openProduct('${escapeHtml(p.id)}')">Ver produto</button>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function openAddProduct(){
+    if(!usuarioLogado) return openLogin();
+    $('prodNome').value=''; $('prodImagem').value=''; $('prodPreco').value=''; $('prodDescricao').value=''; $('prodDownload').value=''; $('publishMsg').innerHTML='';
+    openModal('addProductModal');
+  }
+
+  async function publishProduct(event){
+    event.preventDefault();
+    const btn=$('publishBtn');
+    btn.disabled=true; btn.textContent='A enviar...'; $('publishMsg').innerHTML='';
+    try{
+      const res=await apiPost('publicarProduto',{
+        userId:usuarioLogado.id,
+        nome:$('prodNome').value.trim(),
+        imagemUrl:$('prodImagem').value.trim(),
+        preco:Number($('prodPreco').value),
+        descricao:$('prodDescricao').value.trim(),
+        downloadUrl:$('prodDownload').value.trim()
+      });
+      if(!res.success) throw new Error(res.message || 'Não foi possível publicar o produto.');
+      $('publishMsg').innerHTML='<div class="notice success">Produto enviado para aprovação. ID: '+escapeHtml(res.produtoId || '')+'</div>';
+      toast('Produto enviado para aprovação.');
+      setTimeout(()=>{closeModal('addProductModal');loadDashboard();},900);
+    }catch(err){
+      $('publishMsg').innerHTML='<div class="notice error">'+escapeHtml(err.message)+'</div>';
+    }finally{
+      btn.disabled=false; btn.textContent='Enviar para aprovação';
+    }
+  }
+
+  async function generatePartnerLink(productId){
+    try{
+      const res=await apiPost('gerarLinkParceiro',{userId:usuarioLogado.id,productId:productId});
+      if(!res.success) throw new Error(res.message || 'Não foi possível gerar o link.');
+      const link=new URL(res.link,location.href).href;
+      try{ await navigator.clipboard.writeText(link); toast('Link de parceiro copiado.'); }
+      catch(e){ prompt('Copie o seu link de parceiro:',link); }
+    }catch(err){ toast(err.message); }
   }
 
   async function cashout(perfil){
